@@ -1,0 +1,16 @@
+FROM registry.suse.com/bci/golang:1.22
+
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v1.55.2;
+
+# -- for dapper
+ENV DAPPER_RUN_ARGS --privileged --network host -v /run/containerd/containerd.sock:/run/containerd/containerd.sock
+ENV GO111MODULE off
+ENV DAPPER_ENV REPO TAG DRONE_TAG CROSS GOPROXY
+ENV DAPPER_DOCKER_SOCKET true
+ENV DAPPER_SOURCE /go/src/github.com/harvester/support-tools
+ENV DAPPER_OUTPUT ./bin
+# -- for dapper
+
+WORKDIR ${DAPPER_SOURCE}
+ENTRYPOINT ["./scripts/entry"]
+CMD ["ci"]
